@@ -120,7 +120,7 @@ class Parser {
 			["..."],
 			["&&"],
 			["||"],
-			["=","+=","-=","*=","/=","%=","<<=",">>=",">>>=","|=","&=","^=","=>"],
+			["=","+=","-=","*=","/=","%=",#if cpp "??"+"=" #else "??=" #end,"<<=",">>=",">>>=","|=","&=","^=","=>"],
 			["->"]
 		];
 		opPriority = new Map();
@@ -1535,8 +1535,12 @@ class Parser {
 				char = readChar();
 				if( char == ".".code )
 					return TQuestionDot;
-				else if ( char == "?".code )
+				else if ( char == "?".code ) {
+					char = readChar();
+					if ( char == "=".code )
+						return TOp(#if cpp "??"+"=" #else "??=" #end);
 					return TQuestionQuestion;
+				}
 				this.char = char;
 				return TQuestion;
 			case ":".code: return TDoubleDot;
