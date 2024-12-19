@@ -771,18 +771,22 @@ class Interp {
 		error(ECustom("Invalid map keys "+keys));
 		return null;
 	}
+	var extraDataCache:Map<String, Map<String, Dynamic>> = [];
 
 	function get( o : Dynamic, f : String ) : Dynamic {
 		if ( o == null ) error(EInvalidAccess(f));
-		var c = Type.getClass(o);
 		var hasExtraData:Bool = false;
 		var extraData:Map<String, Dynamic> = null;
-
-		for(field in (c == null ? Reflect.fields(o) : Type.getInstanceFields(c))){
-			if(field == 'extraData'){
+		var c = Type.getClass(o);
+		var n = Type.getClassName(c);
+		if (extraDataCache.exists(n)) {
+			hasExtraData = true;
+			extraData = extraDataCache.get(n);
+		} else {
+			extraData = Reflect.field(o, 'extraData');
+			if (extraData != null) {
+				extraDataCache.set(n, extraData);
 				hasExtraData = true;
-				extraData = Reflect.field(o, 'extraData');
-				break;
 			}
 		}
 
@@ -809,15 +813,18 @@ class Interp {
 
 	function set( o : Dynamic, f : String, v : Dynamic ) : Dynamic {
 		if( o == null ) error(EInvalidAccess(f));
-		var c = Type.getClass(o);
 		var hasExtraData:Bool = false;
 		var extraData:Map<String, Dynamic> = null;
-
-		for (field in (c == null ? Reflect.fields(o) : Type.getInstanceFields(c))) {
-			if (field == 'extraData') {
+		var c = Type.getClass(o);
+		var n = Type.getClassName(c);
+		if (extraDataCache.exists(n)){
+			hasExtraData = true;
+			extraData = extraDataCache.get(n);
+		}else{
+			extraData = Reflect.field(o, 'extraData');
+			if (extraData != null){
+				extraDataCache.set(n, extraData);
 				hasExtraData = true;
-				extraData = Reflect.field(o, 'extraData');
-				break;
 			}
 		}
 
