@@ -772,23 +772,18 @@ class Interp {
 		return null;
 	}
 
-	var extraDataCache:Map<String, Dynamic> = [];
+	var extraDataCache:Map<String, Bool> = [];
 
 	function getExtraData(o:Dynamic):Null<Map<String, Dynamic>>{
 		var c = Type.getClass(o);
-		var n = Type.getClassName(c);
+		var n:Null<String> = c==null?null:Type.getClassName(c);
 
 		var extraData:Dynamic;
-		if (extraDataCache.exists(n)) {
-			extraData = extraDataCache.get(n);
-			if(extraData == -1)
-				return null;
+		if (extraDataCache.get(n) == false) {
+			return null;
 		} else {
 			extraData = Reflect.field(o, 'extraData');
-			if (extraData != null) {
-				extraDataCache.set(n, extraData);
-			} else
-				extraDataCache.set(n, -1);
+			extraDataCache.set(n, extraData != null);
 		}
 		return cast extraData;
 	}
