@@ -774,7 +774,10 @@ class Interp {
 
 	var extraDataCache:Map<String, Dynamic> = [];
 
-	function getExtraData(o:Dynamic, n:String):Null<Map<String, Dynamic>>{
+	function getExtraData(o:Dynamic):Null<Map<String, Dynamic>>{
+		var c = Type.getClass(o);
+		var n = Type.getClassName(c);
+
 		var extraData:Dynamic;
 		if (extraDataCache.exists(n)) {
 			extraData = extraDataCache.get(n);
@@ -792,10 +795,8 @@ class Interp {
 
 	function get( o : Dynamic, f : String ) : Dynamic {
 		if ( o == null ) error(EInvalidAccess(f));
-		var c = Type.getClass(o);
-		var n = Type.getClassName(c);
 
-		var extraData:Null<Map<String, Dynamic>> = getExtraData(o, n);
+		var extraData:Null<Map<String, Dynamic>> = getExtraData(o);
 
 		if (extraData != null){
 			if (extraData.exists('get_$f'))
@@ -821,10 +822,7 @@ class Interp {
 	function set( o : Dynamic, f : String, v : Dynamic ) : Dynamic {
 		if( o == null ) error(EInvalidAccess(f));
 
-		var c = Type.getClass(o);
-		var n = Type.getClassName(c);
-
-		var extraData:Null<Map<String, Dynamic>> = getExtraData(o, n);
+		var extraData:Null<Map<String, Dynamic>> = getExtraData(o);
 
 		if (extraData != null) {
 			if (extraData.exists('set_$f'))
