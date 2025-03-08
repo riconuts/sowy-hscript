@@ -779,13 +779,21 @@ class Interp {
 		var n:Null<String> = c==null?null:Type.getClassName(c);
 
 		var extraData:Dynamic;
-		if (extraDataCache.get(n) == false) {
-			return null;
-		} else {
+		inline function getdefault()
 			extraData = Reflect.field(o, 'extraData');
-			extraDataCache.set(n, extraData != null);
+
+		if (n == null)
+			getdefault();
+		else switch(extraDataCache.get(n)) {
+			case false:
+				extraData = null;
+			case true:
+				getdefault();
+			case null:
+				getdefault();
+				extraDataCache.set(n, extraData!=null);
 		}
-		return cast extraData;
+		return extraData;
 	}
 
 	function get( o : Dynamic, f : String ) : Dynamic {
